@@ -27,7 +27,8 @@ function NodeEvents({ node, playerIndex, resolver }) {
   const events = [];
 
   if (p.card_picked) events.push({ key: 'card', icon: '🃏', text: `Picked ${resolver.card(p.card_picked)}` });
-  if (p.relic_picked) events.push({ key: 'relic', icon: '🔮', text: `Relic: ${resolver.name('relic', p.relic_picked)}` });
+  // Skip relic_picked when it's already shown via neow_choice (same item, different field)
+  if (p.relic_picked && p.relic_picked !== p.neow_choice) events.push({ key: 'relic', icon: '🔮', text: `Relic: ${resolver.name('relic', p.relic_picked)}` });
   if (p.neow_choice) events.push({ key: 'neow', icon: '✨', text: `Neow: ${resolver.name('neow', p.neow_choice)}` });
   if (p.rest_choice) {
     const rc = Array.isArray(p.rest_choice) ? p.rest_choice[0] : p.rest_choice;
@@ -44,9 +45,13 @@ function NodeEvents({ node, playerIndex, resolver }) {
   if ((p.colorless_bought ?? []).length > 0) {
     events.push({ key: 'shop_c', icon: '🛒', text: resolver.cards(p.colorless_bought).join(', ') });
   }
-  if (p.event_choice) {
-    const label = String(p.event_choice).split('.').pop().replace(/_/g, ' ');
-    events.push({ key: 'event', icon: '📜', text: label });
+  if (p.event_choice && !p.neow_choice) {
+    // Skip junk suffixes like "RELIC_ID.title"
+    const raw = String(p.event_choice);
+    const label = raw.split('.').pop().replace(/_/g, ' ');
+    if (label.toLowerCase() !== 'title' && label.toLowerCase() !== 'description') {
+      events.push({ key: 'event', icon: '📜', text: label });
+    }
   }
 
   return (
@@ -129,12 +134,19 @@ function RunSelector({ runs, selectedId, onSelect, resolver }) {
 
 export default function TimelineView() {
   const { pocRuns, resolver } = useRunData();
-  const [selectedId, setSelectedId] = useState(() => pocRuns[0]?.__run_id ?? null);
+
+  // Sort runs latest-first
+  const sortedRuns = useMemo(
+    () => [...pocRuns].sort((a, b) => (b.meta?.start_time ?? 0) - (a.meta?.start_time ?? 0)),
+    [pocRuns],
+  );
+
+  const [selectedId, setSelectedId] = useState(() => sortedRuns[0]?.__run_id ?? null);
   const [playerIndex, setPlayerIndex] = useState(0);
 
   const run = useMemo(
-    () => pocRuns.find((r) => r.__run_id === selectedId) ?? pocRuns[0] ?? null,
-    [pocRuns, selectedId],
+    () => sortedRuns.find((r) => r.__run_id === selectedId) ?? sortedRuns[0] ?? null,
+    [sortedRuns, selectedId],
   );
 
   const killedByEnc = run?.meta?.killed_by ?? null;
@@ -145,7 +157,7 @@ export default function TimelineView() {
     <div className="grid" style={{ gap: 'var(--pad-lg)' }}>
       <h2>Timeline</h2>
 
-      <RunSelector runs={pocRuns} selectedId={run?.__run_id} onSelect={setSelectedId} resolver={resolver} />
+      <RunSelector runs={sortedRuns} selectedId={run?.__run_id} onSelect={setSelectedId} resolver={resolver} />
 
       {run && (
         <>

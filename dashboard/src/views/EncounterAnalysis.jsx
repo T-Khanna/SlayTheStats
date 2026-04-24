@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell,
 } from 'recharts';
@@ -7,6 +7,11 @@ import { useFilters } from '../data/useFilters.js';
 import FilterBar from '../components/FilterBar.jsx';
 
 const FIGHT_TYPES = new Set(['monster', 'elite', 'boss']);
+
+// Strip type suffix added by the game (e.g. " (Weak)", " (Elite)", " (Boss)")
+function stripType(name) {
+  return name.replace(/ \((Weak|Normal|Elite|Boss|Strong|Potion)\)$/, '');
+}
 
 const TYPE_COLORS = {
   monster: 'var(--brass-500)',
@@ -29,7 +34,7 @@ function buildEncounterStats(runs, resolver) {
       if (!map.has(enc)) {
         map.set(enc, {
           id: enc,
-          name: resolver.name('encounter', enc),
+          name: stripType(resolver.name('encounter', enc)),
           type: node.type,
           count: 0,
           wins: 0,
@@ -73,21 +78,48 @@ const TOOLTIP_STYLE = {
   fontSize: 13,
 };
 
+const TABLE_COLS = [
+  { key: 'name',     label: 'Encounter',  align: 'left'  },
+  { key: 'type',     label: 'Type',       align: 'right' },
+  { key: 'count',    label: 'Seen',       align: 'right' },
+  { key: 'wins',     label: 'Wins',       align: 'right' },
+  { key: 'deaths',   label: 'Deaths',     align: 'right' },
+  { key: 'winRate',  label: 'Win%',       align: 'right' },
+  { key: 'avgDamage',label: 'Avg DMG',    align: 'right' },
+  { key: 'avgTurns', label: 'Avg Turns',  align: 'right' },
+];
+
 export default function EncounterAnalysis() {
   const { resolver } = useRunData();
   const { filters, setFilter, filteredRuns } = useFilters();
+  const [sort, setSort] = useState({ col: 'count', dir: 'desc' });
+  const [typeFilter, setTypeFilter] = useState('all');
 
-  const rows = useMemo(
+  const baseRows = useMemo(
     () => buildEncounterStats(filteredRuns, resolver),
     [filteredRuns, resolver],
   );
 
-  const top12ByCount = rows.slice(0, 12);
-  const topDeadly = rows
+  const rows = useMemo(() => {
+    const filtered = typeFilter === 'all' ? baseRows : baseRows.filter((r) => r.type === typeFilter);
+    return filtered.slice().sort((a, b) => {
+      const av = a[sort.col];
+      const bv = b[sort.col];
+      if (typeof av === 'string') return sort.dir === 'asc' ? av.localeCompare(bv) : bv.localeCompare(av);
+      return sort.dir === 'asc' ? av - bv : bv - av;
+    });
+  }, [baseRows, sort, typeFilter]);
+
+  function toggleSort(col) {
+    setSort((s) => ({ col, dir: s.col === col && s.dir === 'desc' ? 'asc' : 'desc' }));
+  }
+
+  const top12ByCount = baseRows.slice(0, 12);
+  const topDeadly = baseRows
     .filter((r) => r.deaths > 0)
     .sort((a, b) => b.deaths - a.deaths)
     .slice(0, 10);
-  const topDamaging = rows
+  const topDamaging = baseRows
     .slice()
     .sort((a, b) => b.avgDamage - a.avgDamage)
     .slice(0, 10);
@@ -174,15 +206,45 @@ export default function EncounterAnalysis() {
 
           <section className="panel">
             <h3>All Encounters</h3>
+            <div style={{ display: 'flex', gap: 8, marginBottom: 10, flexWrap: 'wrap', alignItems: 'center' }}>
+              <span style={{ fontSize: '0.8rem', color: 'var(--ink-500)' }}>Filter:</span>
+              {['all', 'monster', 'elite', 'boss'].map((t) => (
+                <button
+                  key={t}
+                  className={`filter-bar__pill${typeFilter === t ? ' is-active' : ''}`}
+                  style={{ fontSize: '0.78rem', padding: '2px 10px' }}
+                  onClick={() => setTypeFilter(t)}
+                >
+                  {t === 'all' ? 'All' : t.charAt(0).toUpperCase() + t.slice(1)}
+                </button>
+              ))}
+            </div>
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
                 <thead>
                   <tr style={{ borderBottom: '2px solid var(--brass-500)' }}>
-                    {['Encounter', 'Type', 'Seen', 'Wins', 'Deaths', 'Win%', 'Avg DMG', 'Avg Turns'].map((h) => (
-                      <th key={h} style={{ padding: '6px 10px', textAlign: h === 'Encounter' ? 'left' : 'right', fontFamily: 'var(--font-display)', fontSize: '0.75rem', letterSpacing: '0.08em', color: 'var(--ink-500)', whiteSpace: 'nowrap' }}>
-                        {h}
-                      </th>
-                    ))}
+                    {TABLE_COLS.map((col) => {
+                      const isActive = sort.col === col.key;
+                      return (
+                        <th
+                          key={col.key}
+                          onClick={col.key !== 'type' ? () => toggleSort(col.key) : undefined}
+                          style={{
+                            padding: '6px 10px',
+                            textAlign: col.align,
+                            fontFamily: 'var(--font-display)',
+                            fontSize: '0.75rem',
+                            letterSpacing: '0.08em',
+                            color: isActive ? 'var(--brass-700)' : 'var(--ink-500)',
+                            whiteSpace: 'nowrap',
+                            cursor: col.key !== 'type' ? 'pointer' : 'default',
+                            userSelect: 'none',
+                          }}
+                        >
+                          {col.label}{isActive ? (sort.dir === 'asc' ? ' ▲' : ' ▼') : ''}
+                        </th>
+                      );
+                    })}
                   </tr>
                 </thead>
                 <tbody>
