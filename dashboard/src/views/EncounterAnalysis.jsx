@@ -36,6 +36,7 @@ function buildEncounterStats(runs, resolver) {
           id: enc,
           name: stripType(resolver.name('encounter', enc)),
           type: node.type,
+          acts: new Set(),
           count: 0,
           wins: 0,
           deaths: 0,
@@ -46,6 +47,7 @@ function buildEncounterStats(runs, resolver) {
 
       const e = map.get(enc);
       e.count += 1;
+      if (node.act) e.acts.add(node.act);
       if (isWin) e.wins += 1;
 
       const killedBy = run.meta?.killed_by;
@@ -60,8 +62,10 @@ function buildEncounterStats(runs, resolver) {
 
   const rows = Array.from(map.values()).map((e) => ({
     ...e,
+    actsLabel: [...e.acts].sort((a, b) => a - b).map((a) => `Act ${a}`).join(', '),
     losses: e.count - e.wins,
     winRate: e.count > 0 ? Math.round((e.wins / e.count) * 100) : 0,
+    beatRate: e.count > 0 ? Math.round(((e.count - e.deaths) / e.count) * 100) : 0,
     avgDamage: e.count > 0 ? Math.round(e.totalDamage / e.count) : 0,
     avgTurns: e.count > 0 ? +(e.totalTurns / e.count).toFixed(1) : 0,
   }));
@@ -79,14 +83,15 @@ const TOOLTIP_STYLE = {
 };
 
 const TABLE_COLS = [
-  { key: 'name',     label: 'Encounter',  align: 'left'  },
-  { key: 'type',     label: 'Type',       align: 'right' },
-  { key: 'count',    label: 'Seen',       align: 'right' },
-  { key: 'wins',     label: 'Wins',       align: 'right' },
-  { key: 'deaths',   label: 'Deaths',     align: 'right' },
-  { key: 'winRate',  label: 'Win%',       align: 'right' },
-  { key: 'avgDamage',label: 'Avg DMG',    align: 'right' },
-  { key: 'avgTurns', label: 'Avg Turns',  align: 'right' },
+  { key: 'name',      label: 'Encounter',  align: 'left',  title: null },
+  { key: 'type',      label: 'Type',       align: 'right', title: null },
+  { key: 'actsLabel', label: 'Act',        align: 'right', title: 'Act(s) this encounter appeared in' },
+  { key: 'count',     label: 'Seen',       align: 'right', title: 'Total times faced across all filtered runs' },
+  { key: 'deaths',    label: 'Kills',      align: 'right', title: 'Times this encounter dealt the killing blow' },
+  { key: 'beatRate',  label: 'Beat%',      align: 'right', title: 'How often you survived this specific fight (Seen − Kills) / Seen' },
+  { key: 'winRate',   label: 'Run Win%',   align: 'right', title: 'Overall run win rate in runs that included this encounter' },
+  { key: 'avgDamage', label: 'Avg DMG',    align: 'right', title: 'Average HP lost in this fight' },
+  { key: 'avgTurns',  label: 'Avg Turns',  align: 'right', title: 'Average turns the fight lasted' },
 ];
 
 export default function EncounterAnalysis() {
@@ -229,6 +234,7 @@ export default function EncounterAnalysis() {
                         <th
                           key={col.key}
                           onClick={col.key !== 'type' ? () => toggleSort(col.key) : undefined}
+                          title={col.title ?? undefined}
                           style={{
                             padding: '6px 10px',
                             textAlign: col.align,
@@ -254,9 +260,10 @@ export default function EncounterAnalysis() {
                       <td style={{ padding: '5px 10px', textAlign: 'right' }}>
                         <span className="tag" style={{ fontSize: '0.75rem' }}>{r.type}</span>
                       </td>
+                      <td style={{ padding: '5px 10px', textAlign: 'right', fontSize: '0.8rem', color: 'var(--ink-500)', whiteSpace: 'nowrap' }}>{r.actsLabel}</td>
                       <td style={{ padding: '5px 10px', textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{r.count}</td>
-                      <td style={{ padding: '5px 10px', textAlign: 'right', color: 'var(--status-win)', fontVariantNumeric: 'tabular-nums' }}>{r.wins}</td>
                       <td style={{ padding: '5px 10px', textAlign: 'right', color: r.deaths > 0 ? 'var(--status-loss)' : 'inherit', fontVariantNumeric: 'tabular-nums' }}>{r.deaths}</td>
+                      <td style={{ padding: '5px 10px', textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{r.beatRate}%</td>
                       <td style={{ padding: '5px 10px', textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{r.winRate}%</td>
                       <td style={{ padding: '5px 10px', textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{r.avgDamage}</td>
                       <td style={{ padding: '5px 10px', textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{r.avgTurns}</td>
