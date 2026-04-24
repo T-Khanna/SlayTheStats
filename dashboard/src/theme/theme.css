@@ -1,0 +1,156 @@
+/* SlayTheStats — Ancient Parchment + Brass theme */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=IM+Fell+English:ital@0;1&display=swap');
+
+:root {
+  /* Parchment palette */
+  --parchment-50: #fbf3df;
+  --parchment-100: #f4e6c1;
+  --parchment-200: #e9d39a;
+  --parchment-300: #d8bb74;
+
+  /* Ink */
+  --ink-900: #2a1d0e;
+  --ink-700: #4a341a;
+  --ink-500: #6b4f2a;
+  --ink-400: #8a6c43;
+
+  /* Brass / gold */
+  --brass-900: #4f3408;
+  --brass-700: #8b5e1f;
+  --brass-500: #b88333;
+  --brass-300: #d6a867;
+  --brass-100: #f1d699;
+
+  /* Outcome / status */
+  --status-win: #4f7a3b;
+  --status-loss: #8b2f2f;
+  --status-neutral: var(--ink-500);
+
+  /* Spacing & radii */
+  --r-sm: 4px;
+  --r-md: 8px;
+  --r-lg: 14px;
+  --pad-sm: 8px;
+  --pad-md: 16px;
+  --pad-lg: 24px;
+
+  /* Typography */
+  --font-display: 'Cinzel', 'IM Fell English', 'Trajan Pro', Georgia, serif;
+  --font-body: 'IM Fell English', 'EB Garamond', Georgia, 'Times New Roman', serif;
+  --font-mono: 'JetBrains Mono', 'Consolas', monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  background: var(--parchment-50);
+  color: var(--ink-900);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+body {
+  background-image:
+    radial-gradient(ellipse at top, rgba(255, 240, 200, 0.6), transparent 60%),
+    repeating-linear-gradient(
+      120deg,
+      rgba(74, 52, 26, 0.025) 0,
+      rgba(74, 52, 26, 0.025) 1px,
+      transparent 1px,
+      transparent 4px
+    ),
+    var(--parchment-50);
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  letter-spacing: 0.04em;
+  color: var(--brass-900);
+  margin: 0 0 var(--pad-sm);
+}
+
+h1 { font-size: 2.2rem; }
+h2 { font-size: 1.6rem; }
+h3 { font-size: 1.25rem; }
+
+a {
+  color: var(--brass-700);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--brass-500);
+  transition: color 120ms ease;
+}
+a:hover { color: var(--brass-900); border-bottom-color: var(--brass-900); }
+
+/* Brass-bordered card panel */
+.panel {
+  background: linear-gradient(180deg, var(--parchment-100), var(--parchment-50));
+  border: 1px solid var(--brass-500);
+  border-radius: var(--r-lg);
+  padding: var(--pad-md);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.4) inset,
+    0 0 0 1px rgba(184, 131, 51, 0.2),
+    0 4px 14px rgba(74, 52, 26, 0.1);
+}
+
+.panel--inset {
+  background: var(--parchment-50);
+}
+
+/* Brass divider */
+.divider {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--brass-500),
+    transparent
+  );
+  margin: var(--pad-md) 0;
+}
+
+/* Pill / tag */
+.tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--parchment-200);
+  color: var(--ink-700);
+  border: 1px solid var(--brass-500);
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+}
+
+.tag--win { background: rgba(79, 122, 59, 0.15); color: var(--status-win); border-color: var(--status-win); }
+.tag--loss { background: rgba(139, 47, 47, 0.12); color: var(--status-loss); border-color: var(--status-loss); }
+
+/* Grid utility */
+.grid {
+  display: grid;
+  gap: var(--pad-md);
+}
+.grid--kpi {
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+}
+.grid--cards {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+/* Loading / empty states */
+.state {
+  padding: var(--pad-lg);
+  text-align: center;
+  color: var(--ink-500);
+  font-style: italic;
+}

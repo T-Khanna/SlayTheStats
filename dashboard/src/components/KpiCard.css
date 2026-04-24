@@ -1,0 +1,27 @@
+.kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.kpi__label {
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-500);
+}
+
+.kpi__value {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--brass-900);
+  line-height: 1.1;
+}
+
+.kpi__hint {
+  font-size: 0.85rem;
+  color: var(--ink-500);
+  font-style: italic;
+}
