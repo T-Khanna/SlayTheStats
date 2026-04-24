@@ -2,7 +2,35 @@
 
 Analytics tooling for Slay the Spire 2 run data.
 
-## Usage
+## Dashboard
+
+A local React dashboard for visualising run history. Requires Node.js 18+.
+
+```bash
+cd dashboard
+npm install         # first time only
+npm run dev         # starts Vite dev server (auto-stages data)
+```
+
+Open the URL printed by Vite (e.g. `http://localhost:5173`).
+
+**Views implemented:**
+- **Overview** — KPI cards, win rate by character, deadliest encounters
+- **Runs** — filterable run list linking to individual run detail
+- **Run Detail** — final deck, relics, run meta
+- **Encounters** — per-encounter stats with sortable table and type filter
+- **Timeline** — per-node floor-by-floor replay for a selected run
+
+**Shared filters:** character, outcome (win/loss), ascension level.
+
+**Coming next:** Card Analysis — composite impact score per card with per-signal tooltip breakdown.
+
+> The data pipeline runs automatically before `dev`/`build` via a `predev` hook.
+> Prerequisites: run `parse_run.py` first to generate `out/simplified/`.
+
+---
+
+## Parser
 
 Parse a single run:
 

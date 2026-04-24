@@ -29,32 +29,40 @@ Solo power user running the dashboard locally against their own `.run` files. No
 
 ## Views
 
-### 1. Overview
-- High-level KPI cards (win rate, total runs, most played character, etc.)
-- Aggregate charts: win rate by character, deaths by encounter, card frequency in wins vs losses
+### 1. Overview ✅
+- High-level KPI cards (win rate, total runs, avg gold, avg damage, characters played)
+- Win rate by character bar chart
+- Deadliest encounters horizontal bar chart
+- Shared filter bar (character, outcome, ascension)
 
-### 2. Run Detail
-- Inspect a single run: character, ascension level, outcome, score
-- Card deck at end, relics acquired, potions used
-- Floor-by-floor path through the map
+### 2. Run Detail ✅
+- Inspect a single run: character, ascension level, outcome, duration
+- Final deck (resolved display names), relics list, run totals
 
-### 3. Encounter Analysis
-- Per-encounter stats: encounter count, win rate when encountered, death count
-- Compare encounters across acts
+### 3. Encounter Analysis ✅
+- Per-encounter stats: seen count, wins, deaths, win%, avg damage, avg turns
+- Most encountered chart (colour-coded by type: monster / elite / boss)
+- Deadliest and most damaging horizontal bar charts
+- Sortable full table with type filter (All / Monster / Elite / Boss)
 
-### 4. Timeline (Run Replay)
-- Per-node, per-floor timeline of a selected run
-- Key events surfaced: card picks, relic pickups, elite fights, boss fights, rest choices, gold changes
+### 4. Timeline (Run Replay) ✅
+- Run selector showing all available runs sorted latest-first
+- Per-node vertical timeline: type badge, encounter/event name, HP, gold, turns
+- Events surfaced per node: card picks, relic pickups, Neow choice, rest choices, upgrades, shop buys, damage/healing
+
+### 5. Card Analysis 🔲 *(next)*
+- Composite impact score per card across all solo runs
+- Tooltip on hover shows individual signal weights: pick rate in wins, win-rate correlation, damage minimization, turn minimization
+- Sortable table + top-N bar chart
+- Filtered by character, outcome, ascension
 
 ---
 
 ## Filters
 
-- Character (Ironclad, Silent, Defect, Watcher, Necrobinder)
-- Act (1, 2, 3, epilogue)
+- Character (Ironclad, Silent, Defect, Regent, Necrobinder)
 - Outcome (win / loss)
-- Date range
-- Ascension level range
+- Ascension level (min slider)
 
 ---
 
@@ -69,11 +77,12 @@ Solo power user running the dashboard locally against their own `.run` files. No
 
 ---
 
-## Scope — Proof of Concept
+## Scope
 
-POC is scoped to the **latest 3 single-player runs per character** to keep iteration fast:
+### Phase 1 — Proof of Concept ✅ complete
+Scoped to the **latest 3 single-player runs per character** to keep iteration fast.
 
-- Filter: `meta.player_count === 1`
-- Sort by `meta.timestamp` descending
-- Take top 3 per unique character
-- Remaining runs ignored until full build phase
+### Phase 2 — Full Build *(in progress)*
+- Expand data slice to **all solo runs** (`meta.player_count === 1`, no cap per character)
+- Add **Card Analysis** view (view 5)
+- Multi-player co-op runs remain out of scope for now

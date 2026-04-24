@@ -80,7 +80,7 @@ const CHARACTER_COLORS = {
   IRONCLAD: '#8b2f2f',
   SILENT: '#3f6b3a',
   DEFECT: '#3a5a8b',
-  WATCHER: '#6b3a8b',
+  REGENT:     '#6b3a8b',
   NECROBINDER: '#5a4a3a',
 };
 

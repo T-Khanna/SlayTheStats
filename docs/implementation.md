@@ -4,9 +4,10 @@
 
 | Layer | Choice | Rationale |
 |-------|--------|-----------|
-| Framework | React + Vite | Fast HMR, minimal config, familiar ecosystem |
-| Charts | Recharts (primary) + Chart.js (fallback) | Recharts is React-native; Chart.js for edge cases |
-| Styling | CSS Modules or Tailwind (TBD at scaffold) | Keep theming isolated per component |
+| Framework | React 19 + Vite 8 | Fast HMR, minimal config, familiar ecosystem |
+| Router | React Router DOM 7 | State-based navigation across 4+ views |
+| Charts | Recharts 3 | React-native, composable |
+| Styling | CSS Custom Properties (no framework) | Full theming control; parchment + brass variables in `theme.css` |
 | Data | Static local JSON, no backend | All data is local; no network or server needed |
 
 ---
@@ -56,9 +57,9 @@ Upgraded card convention: `NOXIOUS_FUMES+1` → `"Noxious Fumes+"` (matches in-g
 
 ---
 
-## Card Impact Scoring
+## Card Impact Scoring *(Phase 2 — next feature)*
 
-**Weighted composite score** combining multiple signals:
+**Weighted composite score** combining multiple signals per card across all solo runs:
 
 | Signal | Weight | Notes |
 |--------|--------|-------|
@@ -68,7 +69,7 @@ Upgraded card convention: `NOXIOUS_FUMES+1` → `"Noxious Fumes+"` (matches in-g
 | Turn minimization | Medium | Correlated with shorter fights |
 | Act-bias correction | Applied | Normalize for cards that only appear in act 1 vs act 3 |
 
-Cards ranked by composite score descending. Displayed in the Overview and Encounter Analysis views.
+Cards ranked by composite score descending. Displayed in the dedicated **Card Analysis** view. Hovering a card in the table shows a breakdown tooltip with each individual signal value and its contribution to the composite score.
 
 ---
 
@@ -86,21 +87,24 @@ Cards ranked by composite score descending. Displayed in the Overview and Encoun
 
 ---
 
-## POC Data Slice
+## Data Slice
 
+### Phase 1 (POC) — complete
 ```js
-// Load all simplified JSONs, filter to single-player runs,
-// take latest 3 per character
+// Latest 3 single-player runs per character
 const pocRuns = allRuns
   .filter(r => r.meta.player_count === 1)
-  .sort((a, b) => b.meta.timestamp - a.meta.timestamp)
+  .sort((a, b) => b.meta.start_time - a.meta.start_time)
   .reduce((acc, run) => {
-    const char = run.meta.character; // e.g. "IRONCLAD", "SILENT", "DEFECT", "WATCHER", "NECROBINDER"
+    const char = run.players[0].character; // e.g. "IRONCLAD", "SILENT", "DEFECT", "REGENT", "NECROBINDER"
     acc[char] = acc[char] ?? [];
     if (acc[char].length < 3) acc[char].push(run);
     return acc;
   }, {});
 ```
+
+### Phase 2 (Full Build) — in progress
+Remove the per-character cap. All solo runs (`player_count === 1`) are included. The `pocSlice.js` function will be replaced or made configurable.
 
 ---
 
@@ -109,24 +113,30 @@ const pocRuns = allRuns
 ```
 dashboard/
 ├── public/
-│   └── data/               ← symlink or copy of out/simplified/ + data/display_names.json
+│   └── data/               ← gitignored; populated by prepare-data.mjs
+├── scripts/
+│   └── prepare-data.mjs   ← copies simplified JSON + display_names into public/data/
 ├── src/
-│   ├── assets/             ← fonts, textures (parchment, brass)
 │   ├── components/
-│   │   ├── KpiCard/
-│   │   ├── RunCard/
-│   │   ├── EncounterTable/
-│   │   ├── Timeline/
-│   │   └── Charts/
-│   ├── hooks/
-│   │   └── useRunData.js   ← loads + filters + resolves display names
+│   │   ├── FilterBar.jsx / .css
+│   │   ├── KpiCard.jsx / .css
+│   │   └── Layout.jsx / .css
+│   ├── data/
+│   │   ├── nameResolver.js    ← resolves raw IDs via display_names.json
+│   │   ├── runLoader.js       ← fetch manifest + all runs + display_names
+│   │   ├── pocSlice.js        ← filter to solo runs (cap to be lifted in phase 2)
+│   │   ├── RunDataContext.jsx ← global context: allRuns, pocRuns, resolver
+│   │   └── useFilters.js      ← shared filter state + filteredRuns derivation
+│   ├── theme/
+│   │   └── theme.css          ← CSS custom properties: parchment + brass palette
 │   ├── views/
 │   │   ├── Overview.jsx
+│   │   ├── Runs.jsx
 │   │   ├── RunDetail.jsx
 │   │   ├── EncounterAnalysis.jsx
-│   │   └── TimelineView.jsx
-│   ├── nameResolver.js     ← resolves IDs via display_names.json (adapt/replace displayNameMapper.js as needed)
-│   ├── theme.css           ← parchment + brass CSS variables
+│   │   ├── TimelineView.jsx / .css
+│   │   └── CardAnalysis.jsx   ← planned (phase 2)
+│   ├── App.jsx
 │   └── main.jsx
 ├── index.html
 ├── vite.config.js
@@ -146,9 +156,8 @@ npm install recharts
 
 ---
 
-## Out of Scope (POC)
+## Out of Scope
 
-- No routing library (single-page with state-based view switching is sufficient for POC)
 - No persistence (filters reset on reload)
-- No card/relic image assets (text + styled tooltips only for POC)
-- No multi-player co-op run support (filtered out by `player_count === 1`)
+- No card/relic image assets (text-only for now)
+- Multi-player co-op run support (filtered out by `player_count === 1`)
