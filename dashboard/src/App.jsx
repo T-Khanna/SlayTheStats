@@ -5,6 +5,7 @@ import Runs from './views/Runs.jsx';
 import RunDetail from './views/RunDetail.jsx';
 import EncounterAnalysis from './views/EncounterAnalysis.jsx';
 import TimelineView from './views/TimelineView.jsx';
+import CardAnalysis from './views/CardAnalysis.jsx';
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
           <Route path="runs/:runId" element={<RunDetail />} />
           <Route path="encounters" element={<EncounterAnalysis />} />
           <Route path="timeline" element={<TimelineView />} />
+          <Route path="cards" element={<CardAnalysis />} />
           <Route path="*" element={<div className="state">Page not found.</div>} />
         </Route>
       </Routes>

@@ -7,6 +7,7 @@ const NAV = [
   { to: '/runs', label: 'Runs' },
   { to: '/encounters', label: 'Encounters' },
   { to: '/timeline', label: 'Timeline' },
+  { to: '/cards', label: 'Cards' },
 ];
 
 export default function Layout() {
@@ -48,7 +49,7 @@ export default function Layout() {
       <footer className="layout__footer">
         <span>
           {status === 'ready'
-            ? `${pocRuns.length} POC runs (of ${allRuns.length} total)`
+            ? `${pocRuns.length} solo runs (${allRuns.length} total)`
             : '\u00a0'}
         </span>
       </footer>

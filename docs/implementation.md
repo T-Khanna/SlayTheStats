@@ -57,19 +57,19 @@ Upgraded card convention: `NOXIOUS_FUMES+1` → `"Noxious Fumes+"` (matches in-g
 
 ---
 
-## Card Impact Scoring *(Phase 2 — next feature)*
+## Card Impact Scoring ✅
 
-**Weighted composite score** combining multiple signals per card across all solo runs:
+**Weighted composite score** combining multiple signals per card across all solo runs.
+Starter cards (Strikes, Defends) are excluded — they appear in every run and carry no discriminating signal.
 
 | Signal | Weight | Notes |
 |--------|--------|-------|
-| Pick rate in winning runs | High | Cards selected more in wins |
-| Win-rate correlation | High | Runs containing this card → win% |
-| Damage minimization | Medium | Correlated with lower HP loss |
-| Turn minimization | Medium | Correlated with shorter fights |
-| Act-bias correction | Applied | Normalize for cards that only appear in act 1 vs act 3 |
+| Win-rate lift | 35% | Card-in-deck win% minus overall win% |
+| Pick rate in wins | 35% | How often the card is chosen when offered, in winning runs |
+| Damage reduction | 15% | Runs with card show below-average HP loss |
+| Turn efficiency | 15% | Runs with card have shorter average combats |
 
-Cards ranked by composite score descending. Displayed in the dedicated **Card Analysis** view. Hovering a card in the table shows a breakdown tooltip with each individual signal value and its contribution to the composite score.
+All signals are min-max normalised to 0–100 before weighting. Cards ranked by composite score descending. Displayed in the **Card Analysis** view with a top-15 bar chart and full sortable table. Hovering a row shows a fixed signal breakdown panel (bottom-right) with each normalised signal value and raw run counts.
 
 ---
 
@@ -103,8 +103,8 @@ const pocRuns = allRuns
   }, {});
 ```
 
-### Phase 2 (Full Build) — in progress
-Remove the per-character cap. All solo runs (`player_count === 1`) are included. The `pocSlice.js` function will be replaced or made configurable.
+### Phase 2 (Full Build) — complete
+Per-character cap removed. All solo runs (`player_count === 1`) are included. `pocSlice.js` updated accordingly.
 
 ---
 
@@ -124,7 +124,7 @@ dashboard/
 │   ├── data/
 │   │   ├── nameResolver.js    ← resolves raw IDs via display_names.json
 │   │   ├── runLoader.js       ← fetch manifest + all runs + display_names
-│   │   ├── pocSlice.js        ← filter to solo runs (cap to be lifted in phase 2)
+│   │   ├── pocSlice.js        ← filter to solo runs (all solo runs, no cap)
 │   │   ├── RunDataContext.jsx ← global context: allRuns, pocRuns, resolver
 │   │   └── useFilters.js      ← shared filter state + filteredRuns derivation
 │   ├── theme/
@@ -135,7 +135,7 @@ dashboard/
 │   │   ├── RunDetail.jsx
 │   │   ├── EncounterAnalysis.jsx
 │   │   ├── TimelineView.jsx / .css
-│   │   └── CardAnalysis.jsx   ← planned (phase 2)
+│   │   └── CardAnalysis.jsx   ← card impact scoring (phase 2)
 │   ├── App.jsx
 │   └── main.jsx
 ├── index.html

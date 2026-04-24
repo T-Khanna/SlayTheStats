@@ -50,10 +50,11 @@ Solo power user running the dashboard locally against their own `.run` files. No
 - Per-node vertical timeline: type badge, encounter/event name, HP, gold, turns
 - Events surfaced per node: card picks, relic pickups, Neow choice, rest choices, upgrades, shop buys, damage/healing
 
-### 5. Card Analysis 🔲 *(next)*
+### 5. Card Analysis ✅
 - Composite impact score per card across all solo runs
-- Tooltip on hover shows individual signal weights: pick rate in wins, win-rate correlation, damage minimization, turn minimization
-- Sortable table + top-N bar chart
+- Starter cards (Strikes, Defends) excluded — present in every run, no signal value
+- Hover signal panel shows individual normalised signal weights: win-rate lift, pick rate in wins, damage reduction, turn efficiency
+- Sortable table + top-15 bar chart
 - Filtered by character, outcome, ascension
 
 ---
@@ -82,7 +83,7 @@ Solo power user running the dashboard locally against their own `.run` files. No
 ### Phase 1 — Proof of Concept ✅ complete
 Scoped to the **latest 3 single-player runs per character** to keep iteration fast.
 
-### Phase 2 — Full Build *(in progress)*
-- Expand data slice to **all solo runs** (`meta.player_count === 1`, no cap per character)
-- Add **Card Analysis** view (view 5)
+### Phase 2 — Full Build ✅ complete
+- Expanded data slice to **all solo runs** (`meta.player_count === 1`, no cap per character)
+- Added **Card Analysis** view (view 5)
 - Multi-player co-op runs remain out of scope for now
