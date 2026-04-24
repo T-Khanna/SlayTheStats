@@ -24,6 +24,8 @@ python parse_run.py --compact data/run_history/ out/simplified/
 
 Output files are written to `out/` which is excluded from version control — regenerate them locally as needed.
 
+See [docs/schema.md](docs/schema.md) for a full reference of the output structure.
+
 ## Data
 
 Raw run files are stored in `data/run_history/` as `.run` files (binary JSON exported by STS2). Each file is named by Unix timestamp and represents a single complete or abandoned run.
