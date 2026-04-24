@@ -1,0 +1,6 @@
+# Generated parser output - reproduce with: python parse_run.py data/run_history/ out/simplified/
+out/
+
+# Python
+__pycache__/
+*.py[cod]
