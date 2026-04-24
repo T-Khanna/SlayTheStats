@@ -103,6 +103,7 @@ export default function Overview() {
       )}
 
       {filteredRuns.length > 0 && (
+      <>
       <div className="grid grid--kpi">
         <KpiCard label="Runs" value={stats.total} hint="POC slice" />
         <KpiCard
@@ -180,6 +181,7 @@ export default function Overview() {
           )}
         </section>
       </div>
+      </>
       )}
     </div>
   );
