@@ -10,7 +10,9 @@ import {
   Cell,
 } from 'recharts';
 import { useRunData } from '../data/RunDataContext.jsx';
+import { useFilters } from '../data/useFilters.js';
 import KpiCard from '../components/KpiCard.jsx';
+import FilterBar from '../components/FilterBar.jsx';
 
 function summarise(runs, resolver) {
   const total = runs.length;
@@ -87,17 +89,20 @@ function colorFor(char) {
 }
 
 export default function Overview() {
-  const { pocRuns, resolver } = useRunData();
-  const stats = useMemo(() => summarise(pocRuns, resolver), [pocRuns, resolver]);
-
-  if (pocRuns.length === 0) {
-    return <div className="state">No runs available.</div>;
-  }
+  const { resolver } = useRunData();
+  const { filters, setFilter, filteredRuns } = useFilters();
+  const stats = useMemo(() => summarise(filteredRuns, resolver), [filteredRuns, resolver]);
 
   return (
     <div className="grid" style={{ gap: 'var(--pad-lg)' }}>
       <h2>The Chronicle</h2>
+      <FilterBar filters={filters} setFilter={setFilter} runCount={filteredRuns.length} />
 
+      {filteredRuns.length === 0 && (
+        <div className="state">No runs match the current filters.</div>
+      )}
+
+      {filteredRuns.length > 0 && (
       <div className="grid grid--kpi">
         <KpiCard label="Runs" value={stats.total} hint="POC slice" />
         <KpiCard
@@ -175,6 +180,7 @@ export default function Overview() {
           )}
         </section>
       </div>
+      )}
     </div>
   );
 }

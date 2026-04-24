@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useRunData } from '../data/RunDataContext.jsx';
+import { useFilters } from '../data/useFilters.js';
+import FilterBar from '../components/FilterBar.jsx';
 
 function formatDuration(seconds) {
   if (!seconds) return '—';
@@ -14,13 +16,16 @@ function formatDate(epoch) {
 }
 
 export default function Runs() {
-  const { pocRuns, resolver } = useRunData();
+  const { resolver } = useRunData();
+  const { filters, setFilter, filteredRuns } = useFilters();
 
   return (
     <div>
       <h2>Runs</h2>
-      <div className="grid grid--cards">
-        {pocRuns.map((run) => {
+      <FilterBar filters={filters} setFilter={setFilter} runCount={filteredRuns.length} />
+      {filteredRuns.length === 0 && <div className="state">No runs match the current filters.</div>}
+      <div className="grid grid--cards" style={{ marginTop: 'var(--pad-md)' }}>
+        {filteredRuns.map((run) => {
           const player = run.players?.[0];
           const charName = resolver.name('character', player?.character);
           const win = run.meta?.win;
