@@ -1,6 +1,11 @@
 # Generated parser output - reproduce with: python parse_run.py data/run_history/ out/simplified/
 out/
 
+# Dashboard build artefacts
+dashboard/node_modules/
+dashboard/dist/
+dashboard/public/data/
+
 # Python
 __pycache__/
 *.py[cod]
