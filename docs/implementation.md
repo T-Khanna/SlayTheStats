@@ -26,9 +26,10 @@
 ## Data Pipeline
 
 ```
-data/run_history/*.run
+STS2 history folder (*.run)
+.../SlayTheSpire2/steam/<account>/profile*/saves/history
         │
-        ▼ parse_run.py --output out/simplified/ data/run_history/
+  ▼ npm run ingest-latest [-- --count N | -- --all]
         │
 out/simplified/*.simplified.json   (ID-only, ~70% size reduction)
         │
@@ -42,6 +43,7 @@ React components
 
 - `out/simplified/` is **gitignored** — regenerate locally with the parser
 - `data/display_names.json` is committed and loaded as a static asset
+- `data/run_history/` is deprecated; use live history ingestion by default
 
 ---
 

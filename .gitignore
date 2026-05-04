@@ -1,4 +1,4 @@
-# Generated parser output - reproduce with: python parse_run.py data/run_history/ out/simplified/
+# Generated parser output - reproduce with: cd dashboard ; npm run ingest-latest -- --all
 out/
 
 # Dashboard build artefacts

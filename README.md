@@ -43,28 +43,37 @@ Open the URL printed by Vite (e.g. `http://localhost:5173`).
 **Shared filters:** character, outcome (win/loss), ascension level.
 
 > The data pipeline runs automatically before `dev`/`build` via a `predev` hook.
-> Prerequisites: run `parse_run.py` first to generate `out/simplified/`.
+> Prerequisite: ingest or parse runs first so `out/simplified/` exists.
 
 ---
 
 ## Parser
 
+Recommended (live STS2 source):
+
+```bash
+cd dashboard
+npm run ingest-latest -- --all
+```
+
+Manual parser usage (advanced):
+
 Parse a single run:
 
 ```
-python parse_run.py data/run_history/1774082384.run
+python parse_run.py "C:\\path\\to\\history\\1774082384.run"
 ```
 
 Parse all runs into `out/simplified/`:
 
 ```
-python parse_run.py --output out/simplified/ data/run_history/
+python parse_run.py --output out/simplified/ "C:\\path\\to\\history"
 ```
 
 Use `--compact` to minify the output (no whitespace):
 
 ```
-python parse_run.py --compact --output out/simplified/ data/run_history/
+python parse_run.py --compact --output out/simplified/ "C:\\path\\to\\history"
 ```
 
 Output files are written to `out/` which is excluded from version control — regenerate them locally as needed.
@@ -79,4 +88,6 @@ Parser outputs stay ID-only for compact storage. To decorate run JSON with displ
 
 ## Data
 
-Raw run files are stored in `data/run_history/` as `.run` files (binary JSON exported by STS2). Each file is named by Unix timestamp and represents a single complete or abandoned run.
+Primary source of raw run files is your STS2 history directory (`.../SlayTheSpire2/steam/<account>/profile*/saves/history`).
+
+`data/run_history/` is deprecated and optional; keep it only if you want a checked-in archive snapshot for debugging.
