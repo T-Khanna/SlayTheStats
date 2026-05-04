@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "prepare-data": "node scripts/prepare-data.mjs",
+    "ingest-latest": "node scripts/ingest-latest.mjs",
     "predev": "node scripts/prepare-data.mjs",
     "prebuild": "node scripts/prepare-data.mjs",
     "dev": "vite",

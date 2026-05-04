@@ -12,6 +12,24 @@ npm install         # first time only
 npm run dev         # starts Vite dev server (auto-stages data)
 ```
 
+Ingest new runs from your STS2 history folder and refresh dashboard data:
+
+```bash
+cd dashboard
+npm run ingest-latest                  # ingest the single newest unparsed run
+npm run ingest-latest -- --count 5     # ingest the 5 newest unparsed runs
+npm run ingest-latest -- --all         # ingest every unparsed run
+```
+
+Already-parsed runs are skipped automatically, so these commands are always safe to re-run.
+
+Override the source history directory:
+
+```powershell
+cd dashboard
+$env:STS2_HISTORY_DIR = "C:\\path\\to\\history" ; npm run ingest-latest -- --all
+```
+
 Open the URL printed by Vite (e.g. `http://localhost:5173`).
 
 **Views implemented:**
